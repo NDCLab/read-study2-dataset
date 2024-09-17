@@ -20,3 +20,6 @@ data-monitoring/data-dictionary/central-tracker_datadict_latest.csv
 data-monitoring/preprocess.sub
 data-monitoring/rename-cols.py
 data-monitoring/ndar/
+
+# programming files
+**/__pycache__/
