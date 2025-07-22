@@ -1,0 +1,13 @@
+#!/bin/bash
+#SBATCH --nodes=1
+#SBATCH --ntasks=1
+#SBATCH --time=7-00:00:00
+#SBATCH --account=acc_gbuzzell
+#SBATCH --partition=default-alternate
+
+SINGULARITY_VERSION="3.8.2"
+HM_CONTAINER="/home/data/NDClab/tools/containers/hallMonitor2/hm2_0-5-2.sif"
+DATASET="/home/data/NDClab/datasets/read-study2-dataset"
+
+module load "singularity-$SINGULARITY_VERSION"
+singularity run "$HM_CONTAINER" "$DATASET" --child-data --no-color --suppress-missing-pending-qa
