@@ -1,0 +1,8 @@
+[2025-09-24 17:31:05,791]	(INFO)	Logging initialized at 2025-09-24_17-31 (run by llaplace)
+[2025-09-24 17:31:06,519]	(DEBUG)	No changes to data dictionary
+[2025-09-24 17:31:06,519]	(DEBUG)	Using standard exception file naming
+[2025-09-24 17:31:06,519]	(DEBUG)	suppress_missing_pending_qa=True
+[2025-09-24 17:31:06,533]	(DEBUG)	Devalidated 0 identifier(s)
+[2025-09-24 17:31:06,545]	(INFO)	Starting checked data validation...
+[2025-09-24 17:31:06,554]	(DEBUG)	Found 0 present id(s), 0 expected id(s), 0 missing id(s)
+[2025-09-24 17:31:06,554]	(DEBUG)	Found 0 unique subject/session/run combinations
