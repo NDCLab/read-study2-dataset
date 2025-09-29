@@ -326,53 +326,9 @@ parfor file_locater_counter = 1:length(subjects_to_process)
             EEG = pop_loadbv(rawdata_location, datafile_names{subject});
             EEG = eeg_checkset(EEG);
 
-            %% STEP 4: Change sampling rate & remove reading ranger data
-            if down_sample==1
-                if floor(sampling_rate) > EEG.srate
-                    error ('Sampling rate cannot be higher than recorded sampling rate');
-                elseif floor(sampling_rate) ~= EEG.srate
-                    EEG = pop_resample( EEG, sampling_rate);
-                    EEG = eeg_checkset( EEG );
-                end
-            end
-
-            %make a copy of GSR and sync channels, then delete from eeg structure
-
-            gsrChan = EEG.data(64, :);
-            EEG = pop_select( EEG,'nochannel', 64);
-            EEG = eeg_checkset( EEG );
-
-            syncChan = EEG.data(64, :);
-            EEG = pop_select( EEG,'nochannel', 64);
-            EEG = eeg_checkset( EEG );
-            %[ALLEEG EEG CURRENTSET] = eeg_store(ALLEEG, EEG, CURRENTSET);
-
-            %add in ref channels
-            origData = EEG.data;
-            [origData_NumRows, origData_NumCols] = size(origData);
-            EEG.data = NaN(origData_NumRows+1, origData_NumCols);
-            EEG.data(1,:) = 0; %add ref as zeros
-            EEG.data(2:end,:) = origData; %copy over orig EEG data
-            %%%
-            %delete ground from newChanLocs
-            modNewChanlocs = channel_locations(2:end);
-
-            %replace chanlocs with
-            EEG.chanlocs = modNewChanlocs;
-            EEG.nbchan = EEG.nbchan+1;
-            %%%%
-            EEG = eeg_checkset( EEG );
-            %[ALLEEG EEG CURRENTSET] = eeg_store(ALLEEG, EEG, CURRENTSET);
-
-            EEG = eeg_checkset( EEG );
-            %[ALLEEG EEG CURRENTSET] = eeg_store(ALLEEG, EEG, CURRENTSET);
-
-            % Check whether the channel locations were properly imported. The EEG signals and channel numbers should be same.
-            if size(EEG.data, 1) ~= length(EEG.chanlocs)
-                error('The size of the data does not match with channel numbers.');
-            end
-
-            %Remove reading ranger data from EEG structure (only flanker is included in preprocessing)
+            %% STEP 1b: Remove reading ranger and convert all type field markers to string (if not already)
+            
+            %Remove reading ranger data from EEG structure (only flanker is included in this preprocessing)
             if ismember(EEG.event(2).type, read_stim_marker) %identify if participant begins with reading ranger
                 for i = 1:length(EEG.event)
                     if ismember(EEG.event(i).type, stimulus_markers) %find first event of arrow alert
@@ -412,7 +368,7 @@ parfor file_locater_counter = 1:length(subjects_to_process)
             %update/refresh eeglab and plot
             %eeglab redraw
 
-            %% STEP 1b: convert all type field markers to string (if not already)
+            %convert all type field markers to string (if not already)
 
             %loop through all the type markes, if numeric, convert to string
             % (Given that this script assumes that "type" field markers are strings, we need to
@@ -424,6 +380,78 @@ parfor file_locater_counter = 1:length(subjects_to_process)
                 end
             end
 
+            %% STEP 2: Import channel locations & modify GSR and sync channels
+            %make a copy of GSR and sync channels, then delete from eeg structure
+
+            gsrChan = EEG.data(64, :);
+            EEG = pop_select( EEG,'nochannel', 64);
+            EEG = eeg_checkset( EEG );
+
+            syncChan = EEG.data(64, :);
+            EEG = pop_select( EEG,'nochannel', 64);
+            EEG = eeg_checkset( EEG );
+            %[ALLEEG EEG CURRENTSET] = eeg_store(ALLEEG, EEG, CURRENTSET);
+
+            %add in ref channels
+            origData = EEG.data;
+            [origData_NumRows, origData_NumCols] = size(origData);
+            EEG.data = NaN(origData_NumRows+1, origData_NumCols);
+            EEG.data(1,:) = 0; %add ref as zeros
+            EEG.data(2:end,:) = origData; %copy over orig EEG data
+            %%%
+            %delete ground from newChanLocs
+            modNewChanlocs = channel_locations(2:end);
+
+            %replace chanlocs with
+            EEG.chanlocs = modNewChanlocs;
+            EEG.nbchan = EEG.nbchan+1;
+            %%%%
+            EEG = eeg_checkset( EEG );
+            %[ALLEEG EEG CURRENTSET] = eeg_store(ALLEEG, EEG, CURRENTSET);
+
+            EEG = eeg_checkset( EEG );
+            %[ALLEEG EEG CURRENTSET] = eeg_store(ALLEEG, EEG, CURRENTSET);
+
+            % Check whether the channel locations were properly imported. The EEG signals and channel numbers should be same.
+            if size(EEG.data, 1) ~= length(EEG.chanlocs)
+                error('The size of the data does not match with channel numbers.');
+            end
+
+            %% STEP 3: Adjust anti-aliasing and task related time offset
+            if adjust_time_offset==1
+                % adjust anti-aliasing filter time offset
+                if filter_timeoffset~=0
+                    for aafto=1:length(EEG.event)
+                        EEG.event(aafto).latency=EEG.event(aafto).latency+(filter_timeoffset/1000)*EEG.srate;
+                    end
+                end
+                % adjust stimulus time offset
+                if stimulus_timeoffset~=0
+                    for sto=1:length(EEG.event)
+                        for sm=1:length(stimulus_markers)
+                            if strcmp(EEG.event(sto).type, stimulus_markers{sm})
+                                EEG.event(sto).latency=EEG.event(sto).latency+(stimulus_timeoffset/1000)*EEG.srate;
+                            end
+                        end
+                    end
+                end
+                % adjust response time offset
+                if response_timeoffset~=0
+                    for rto=1:length(EEG.event)
+                        for rm=1:length(response_markers)
+                            if strcmp(EEG.event(rto).type, response_markers{rm})
+                                EEG.event(rto).latency=EEG.event(rto).latency-(response_timeoffset/1000)*EEG.srate;
+                            end
+                        end
+                    end
+                end
+            end 
+
+            %% STEP 4: Down sample data
+            if down_sample==1
+                EEG = pop_resample( EEG, sampling_rate);
+                EEG = eeg_checkset( EEG );
+            end
 
             %% STEP 5: Delete outer layer of channels
             chans_labels=cell(1,EEG.nbchan);
