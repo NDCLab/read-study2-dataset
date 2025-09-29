@@ -1,4 +1,4 @@
-function [] = MADE_pipeline(dataset, subjects, session)
+function [] = MADE_pipeline(dataset, subjects)
 
 %%to Run on FIU HPC%
 % create a local cluster object
@@ -85,7 +85,7 @@ addpath(genpath('/home/data/NDClab/tools/lab-devOps/scripts/MADE_pipeline_standa
 rmpath(['/home/data/NDClab/tools/lab-devOps/scripts/MADE_pipeline_standard/eeglab13_4_4b' filesep 'functions' filesep 'octavefunc' filesep 'signal'])
 
 % 1. Enter the path of the folder that has the raw data to be analyzed
-rawdata_location_parent = strcat(main_dir, '/sourcedata/raw/', session, '/eeg');
+rawdata_location_parent = strcat(main_dir, '/sourcedata/raw/s1_r1/eeg');
 rawdata_location_parent = char(rawdata_location_parent);
 
 % 2. Enter the path of the channel location file
@@ -107,9 +107,10 @@ channel_locations = loadbvef('/home/data/NDClab/tools/lab-devOps/scripts/MADE_pi
 stimulus_markers = {'S  1', 'S  2', 'S  3', 'S  4', 'S 41', 'S 42', 'S 43', ...
     'S 44', 'S 51', 'S 52', 'S 53', 'S 54'};      % enter the stimulus markers that need to be adjusted for time offset
 response_markers = {};       % enter the response makers that need to be adjusted for time offset
+read_stim_marker = {'S255', 'S127'}; %markers to identify reading ranger portion of task
 
 % 5. Do you want to down sample the data?
-down_sample = 1; % 0 = NO (no down sampling), 1 = YES (down sampling)
+down_sample = 0; % 0 = NO (no down sampling), 1 = YES (down sampling)
 sampling_rate = 1000; % set sampling rate (in Hz), if you want to down sample
 
 % 6. Do you want to delete the outer layer of the channels? (Rationale has been described in MADE manuscript)
@@ -174,7 +175,7 @@ subjects_to_process = string(split(subjects, "/"));
 subjects_to_process = subjects_to_process(subjects_to_process~=""); %nvm not necessary
 subjects_to_process = strcat("sub-", subjects_to_process);
 %for file_locater_counter = 1:length(subjects_to_process) % This for loop lists the folders containing the main data files
-parfor file_locater_counter = 1:length(subjects_to_process) %1:4
+parfor file_locater_counter = 1:length(subjects_to_process)
         try
         subjStart = tic;
         rawdata_location = fullfile(rawdata_location_parent, subjects_to_process(file_locater_counter));
@@ -325,7 +326,7 @@ parfor file_locater_counter = 1:length(subjects_to_process) %1:4
             EEG = pop_loadbv(rawdata_location, datafile_names{subject});
             EEG = eeg_checkset(EEG);
 
-            %% STEP 4: Change sampling rate
+            %% STEP 4: Change sampling rate & remove reading ranger data
             if down_sample==1
                 if floor(sampling_rate) > EEG.srate
                     error ('Sampling rate cannot be higher than recorded sampling rate');
@@ -346,8 +347,6 @@ parfor file_locater_counter = 1:length(subjects_to_process) %1:4
             EEG = eeg_checkset( EEG );
             %[ALLEEG EEG CURRENTSET] = eeg_store(ALLEEG, EEG, CURRENTSET);
 
-
-
             %add in ref channels
             origData = EEG.data;
             [origData_NumRows, origData_NumCols] = size(origData);
@@ -365,18 +364,53 @@ parfor file_locater_counter = 1:length(subjects_to_process) %1:4
             EEG = eeg_checkset( EEG );
             %[ALLEEG EEG CURRENTSET] = eeg_store(ALLEEG, EEG, CURRENTSET);
 
-
-
             EEG = eeg_checkset( EEG );
             %[ALLEEG EEG CURRENTSET] = eeg_store(ALLEEG, EEG, CURRENTSET);
-
-            %update/refresh eeglab and plot
-            %eeglab redraw
 
             % Check whether the channel locations were properly imported. The EEG signals and channel numbers should be same.
             if size(EEG.data, 1) ~= length(EEG.chanlocs)
                 error('The size of the data does not match with channel numbers.');
             end
+
+            %Remove reading ranger data from EEG structure (only flanker is included in preprocessing)
+            if ismember(EEG.event(2).type, read_stim_marker) %identify if participant begins with reading ranger
+                for i = 1:length(EEG.event)
+                    if ismember(EEG.event(i).type, stimulus_markers) %find first event of arrow alert
+                        first_event_latency = EEG.event(i).latency;
+                        start_time = max(1, round(first_event_latency - 30*EEG.srate)); %start time is 30s before the first flanker stim event (practice trial inclusive)
+                        EEG_start_time = start_time; %save the start time to use later to select ranges of interest for flanker
+                        break %break to stop it from running on events after the first flanker event
+                    end
+                end
+                EEG.data = EEG.data(:, EEG_start_time:end); %select from 30s before first flanker (EEG_start_time to end of trial for EEG.data)
+                EEG.pnts = size(EEG.data,2); %resizing EEG.pnts to be the pnts in the now updated EEG.data
+                EEG.xmin = (EEG_start_time - 1) / EEG.srate;
+                for i = 1:length(EEG.event)
+                    EEG.event(i).latency = EEG.event(i).latency - EEG_start_time + 1; %update the latency to the new size of EEG.data
+                end
+                EEG.event = EEG.event(arrayfun(@(x)x.latency >= 1, EEG.event)); %
+            end
+
+            if ismember(EEG.event(2).type, stimulus_markers) %identify if participant begins with arrow alert
+                for i = 1:length(EEG.event)
+                    if ismember(EEG.event(i+1).type, read_stim_marker)
+                        last_event_latency = EEG.event(i).latency;
+                        end_time = min(size(EEG.data,2), round(last_event_latency + 30*EEG.srate));
+                        EEG_end_time = end_time;
+                        break
+                    end
+                end
+                EEG.data = EEG.data(:, 1:EEG_end_time);
+                EEG.pnts = size(EEG.data,2);
+                EEG.xmin = 0;
+                EEG.event = EEG.event(arrayfun(@(x) x.latency <= EEG_end_time, EEG.event));
+            end
+                
+            EEG = eeg_checkset(EEG);
+
+
+            %update/refresh eeglab and plot
+            %eeglab redraw
 
             %% STEP 1b: convert all type field markers to string (if not already)
 
