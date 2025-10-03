@@ -1,4 +1,4 @@
-function [] = MADE_pipeline(dataset, subjects)
+function [] = MADE_pipeline(dataset, subjects, session)
 
 %%to Run on FIU HPC%
 % create a local cluster object
@@ -85,7 +85,7 @@ addpath(genpath('/home/data/NDClab/tools/lab-devOps/scripts/MADE_pipeline_standa
 rmpath(['/home/data/NDClab/tools/lab-devOps/scripts/MADE_pipeline_standard/eeglab13_4_4b' filesep 'functions' filesep 'octavefunc' filesep 'signal'])
 
 % 1. Enter the path of the folder that has the raw data to be analyzed
-rawdata_location_parent = strcat(main_dir, '/sourcedata/raw/s1_r1/eeg');
+rawdata_location_parent = strcat(main_dir, '/sourcedata/raw/', session, '/eeg'); %directory on the HPC
 rawdata_location_parent = char(rawdata_location_parent);
 
 % 2. Enter the path of the channel location file
@@ -93,16 +93,16 @@ rawdata_location_parent = char(rawdata_location_parent);
 %channel_locations = loadbvef(strcat(main_dir, '/code/eeg_preprocessing/chan_locs_files/electrode_locs_files/CACS-128-X7-FIXED-64only.bvef'));
 channel_locations = loadbvef('/home/data/NDClab/tools/lab-devOps/scripts/MADE_pipeline_standard/eeg_preprocessing/chan_locs_files/electrode_locs_files/CACS-128-X7-FIXED-64only.bvef');
 
-%need to modify for social vs nonsocial
-
 % STIMULUS TRIGGERS
-% passage text appears on-screen: 11
-% passage text disappears (participant proceeded to the next screen): 10
-% challenge text appears on-screen: 21
-%
-% RESPONSE TRIGGERS
-% error response to challenge question: 30
-% correct response to challenge question: 31
+% Marker - Target Dir + Congruency + Social/Nonsocial
+% S 41 - Right + Congruent + Nonsocial
+% S 42 - Left + Congruent + Nonsocial
+% S 43 - Right + Incongruent + Nonsocial
+% S 44 - Left + Incongruent + Nonsocial
+% S 51 - Right + Congruent + Social
+% S 52 - Left + Congruent + Social
+% S 53 - Right + Incongruent + Social
+% S 54 - Left + Incongruent + Social
 
 % 4. Do your data need correction for anti-aliasing filter and/or task related time offset?
 adjust_time_offset = 1; % 0 = NO (no correction), 1 = YES (correct time offset)
@@ -186,7 +186,7 @@ subjects_to_process = strcat("sub-", subjects_to_process);
 parfor file_locater_counter = 1:length(subjects_to_process)
         try
         subjStart = tic;
-        rawdata_location = fullfile(rawdata_location_parent, subjects_to_process(file_locater_counter));
+        rawdata_location = fullfile(rawdata_location_parent, subjects_to_process(file_locater_counter), session, 'eeg');
         rawdata_location = char(rawdata_location);
         if ~isdir(rawdata_location)
             warning(['Cannot find ' char(subjects_to_process(file_locater_counter)) ' folder in ' rawdata_location_parent ', skipping.']);
@@ -205,7 +205,7 @@ parfor file_locater_counter = 1:length(subjects_to_process)
         end
 
         % Enter the path of the folder where you want to save the processed data
-        output_location = fullfile(main_dir, "derivatives", "preprocessed", subjects_to_process(file_locater_counter), session, "eeg" );
+        output_location = fullfile(main_dir, "derivatives", "preprocessed", subjects_to_process(file_locater_counter), session, 'eeg');
         % update the output_location
         output_location = char(output_location);
 
