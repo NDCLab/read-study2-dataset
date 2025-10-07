@@ -16,7 +16,7 @@ library(dplyr)
 # Change the address below to where you have stored vmrk filesz.
 path <- ("C:/Users/cknowlto/Documents/read-study2-dataset/code/timing-tests")
 # Change the address below to name of the vmrk file name.
-mrkTxt <- readLines(paste(path, "/sys2_2025-10-06_arrow-alert-nf-v1-2-timing-test_stim-timing.vmrk", sep = "")) # load the .vmrk file into the workspace.
+mrkTxt <- readLines(paste(path, "/sys1_2025-10-07_arrow-alert-nf-v1-2-timing-test_stim_timing.vmrk", sep = "")) # load the .vmrk file into the workspace.
 myDat <- setNames(data.frame(matrix(nrow = length(mrkTxt), ncol = 1)), c("colA")) # creates an empty data frame with a single column and row # = length(mrkTxt)
 
 # This 'for' loop creates a dataframe from the loaded text file. 
@@ -142,7 +142,14 @@ sd(practice_dat$timeDiff)
 # nrow(flanker_dat)
 # 720
 
-
+######## Below is the timing test results for the Flanker task of the READ study task on October 6, 2025 - System 1######
+# stimulus triggers
+# mean(flanker_dat$timeDiff)
+# 11.8263888888889
+# sd(flanker_dat$timeDiff)
+# 1.46886964720779
+# nrow(flanker_dat)
+# 720
 
 
 

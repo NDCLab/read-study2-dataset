@@ -108,9 +108,9 @@ channel_locations = loadbvef('/home/data/NDClab/tools/lab-devOps/scripts/MADE_pi
 adjust_time_offset = 1; % 0 = NO (no correction), 1 = YES (correct time offset)
 % If your data need correction for time offset, initialize the offset time (in milliseconds)
 filter_timeoffset = 0;     % anti-aliasing time offset (in milliseconds). 0 = No time offset
-stimulus_timeoffset_list   = []; % NEED TO COLLECT OFFSET TIMES AND THEN ADD THEM HERE FOR READ
-stimulus_timeoffset = round(mean(stimulus_timeoffset_list));
-response_timeoffset = 0;    % response related time offset (in milliseconds). 0 = No time offset
+stimulus_timeoffset_list   = [10.76, 11.83]; % list of stimulus time offsets (in milliseconds) from different subjects to be averaged
+stimulus_timeoffset = round(mean(stimulus_timeoffset_list)); % stimulus related time offset (in milliseconds)
+response_timeoffset = 0; % response related time offset (in milliseconds). 0 = No time offset
 
 stimulus_markers = {'S  1', 'S  2', 'S  3', 'S  4', 'S 41', 'S 42', 'S 43', ...
     'S 44', 'S 51', 'S 52', 'S 53', 'S 54'};      % enter the stimulus markers that need to be adjusted for time offset
