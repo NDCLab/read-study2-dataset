@@ -186,7 +186,7 @@ subjects_to_process = strcat("sub-", subjects_to_process);
 parfor file_locater_counter = 1:length(subjects_to_process)
         try
         subjStart = tic;
-        rawdata_location = fullfile(rawdata_location_parent, subjects_to_process(file_locater_counter), session, 'eeg');
+        rawdata_location = fullfile(rawdata_location_parent, subjects_to_process(file_locater_counter));
         rawdata_location = char(rawdata_location);
         if ~isdir(rawdata_location)
             warning(['Cannot find ' char(subjects_to_process(file_locater_counter)) ' folder in ' rawdata_location_parent ', skipping.']);
