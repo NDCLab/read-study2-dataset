@@ -335,49 +335,18 @@ parfor file_locater_counter = 1:length(subjects_to_process)
             EEG = eeg_checkset(EEG);
 
             %% STEP 1b: Remove reading ranger and convert all type field markers to string (if not already)
-            
-            %Remove reading ranger data from EEG structure (only flanker is included in this preprocessing)
-            if ismember(EEG.event(2).type, read_stim_marker) %identify if participant begins with reading ranger
-                for i = 1:length(EEG.event)
-                    if ismember(EEG.event(i).type, stimulus_markers) %find first event of arrow alert
-                        first_event_latency = EEG.event(i).latency;
-                        start_time = max(1, round(first_event_latency - 30*EEG.srate)); %start time is 30s before the first flanker stim event (practice trial inclusive)
-                        EEG_start_time = start_time; %save the start time to use later to select ranges of interest for flanker
-                        break %break to stop it from running on events after the first flanker event
-                    end
-                end
-                EEG.data = EEG.data(:, EEG_start_time:end); %select from 30s before first flanker (EEG_start_time to end of trial for EEG.data)
-                EEG.pnts = size(EEG.data,2); %resizing EEG.pnts to be the pnts in the now updated EEG.data
-                EEG.xmin = (EEG_start_time - 1) / EEG.srate;
-                for i = 1:length(EEG.event)
-                    EEG.event(i).latency = EEG.event(i).latency - EEG_start_time + 1; %update the latency to the new size of EEG.data
-                end
-                EEG.event = EEG.event(arrayfun(@(x)x.latency >= 1, EEG.event)); %
+            allFlankerMarkers = [stimulus_markers, {'S 11','S 12','S 21','S 22'}];
+            flankerIdx = find(ismember({EEG.event.type}, allFlankerMarkers));
+            if isempty(flankerIdx)
+                error('No flanker stimulus markers found');
             end
-
-            if ismember(EEG.event(2).type, stimulus_markers) %identify if participant begins with arrow alert
-                for i = 1:length(EEG.event)
-                    if ismember(EEG.event(i+1).type, read_stim_marker)
-                        last_event_latency = EEG.event(i).latency;
-                        end_time = min(size(EEG.data,2), round(last_event_latency + 30*EEG.srate));
-                        EEG_end_time = end_time;
-                        break
-                    end
-                end
-                EEG.data = EEG.data(:, 1:EEG_end_time);
-                EEG.pnts = size(EEG.data,2);
-                EEG.xmin = 0;
-                EEG.event = EEG.event(arrayfun(@(x) x.latency <= EEG_end_time, EEG.event));
-            end
-                
+            firstFlanker = EEG.event(flankerIdx(1)).latency;
+            lastFlanker = EEG.event(flankerIdx(end)).latency;
+            startSample = max(1, round(firstFlanker - 30*EEG.srate));
+            endSample = min(EEG.pnts, round(lastFlanker + 30*EEG.srate));
+            EEG = pop_select(EEG, 'point', [startSample endSample]);
             EEG = eeg_checkset(EEG);
-
-
-            %update/refresh eeglab and plot
-            %eeglab redraw
-
             %convert all type field markers to string (if not already)
-
             %loop through all the type markes, if numeric, convert to string
             % (Given that this script assumes that "type" field markers are strings, we need to
             % convert all type field markers to string, in case they are not
