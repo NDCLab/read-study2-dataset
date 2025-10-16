@@ -5,9 +5,9 @@ function [] = MADE_pipeline(dataset, subjects, session)
 cluster = parcluster('local');
 
 % start matlabpool with max workers set in the slurm file
-%parpool(cluster, str2num(getenv('SLURM_CPUS_PER_TASK'))) % this should be same as --cpus-per-task
-workersAvailable = maxNumCompThreads;
-parpool(cluster, workersAvailable)
+parpool(cluster, str2num(getenv('SLURM_CPUS_PER_TASK'))) % this should be same as --cpus-per-task
+%workersAvailable = maxNumCompThreads;
+%parpool(cluster, workersAvailable)
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % This script was initially edited by George Buzzell for the NDC Lab EEG
@@ -356,7 +356,7 @@ parfor file_locater_counter = 1:length(subjects_to_process)
                     EEG.event(atm).type = num2str(EEG.event(atm).type);
                 end
             end
-
+            
             %% STEP 2: Import channel locations & modify GSR and sync channels
             %make a copy of GSR and sync channels, then delete from eeg structure
 
