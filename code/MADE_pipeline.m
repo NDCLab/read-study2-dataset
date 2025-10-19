@@ -851,7 +851,7 @@ parfor file_locater_counter = 1:length(subjects_to_process) %1:4
 
             %% STEP 12: Segment data into fixed length epochs
             %run event labeling script
-            EEG = edit_event_markers_thrive(EEG);
+            EEG = edit_event_markers_read(EEG);
 
             if epoch_data==1
                 if task_eeg ==1 % task eeg
