@@ -1,13 +1,5 @@
 % Define the MADE processing pipeline as a function
-<<<<<<< HEAD
-function [] = MADE_pipeline_testing(dataset, subjects, session)
-
-% dataset: str like 'thrive-dataset'
-% subjects: str like '3000001/3000002/3000003/3000004'
-% session: str like 's1_r1'
-=======
 function [] = MADE_pipeline(dataset, subjects, session)
->>>>>>> addd27c45721363edf9cc73bb3155c5c8756c1fa
 
 % dataset: str like 'thrive-dataset'
 % subjects: str like '3000001/3000002/3000003/3000004'
@@ -107,17 +99,8 @@ addpath(genpath('/home/data/NDClab/tools/lab-devOps/scripts/MADE_pipeline_standa
 rmpath(['/home/data/NDClab/tools/lab-devOps/scripts/MADE_pipeline_standard/eeglab13_4_4b' filesep 'functions' filesep 'octavefunc' filesep 'signal'])
 
 % 1. Enter the path of the folder that has the raw data to be analyzed
-<<<<<<< HEAD
-<<<<<<< HEAD
 %rawdata_location_parent = strcat(main_dir, '/sourcedata/raw/', session, '/eeg');
 rawdata_location_parent = strcat(main_dir, '/sourcedata/raw/', session, '/eeg'); % updated to worlk with checked data only
-=======
-rawdata_location_parent = strcat(main_dir, '/sourcedata/raw/', session, '/eeg'); %directory on the HPC
->>>>>>> 10431854dee3db21da87de7075425644a3f470bf
-=======
-%rawdata_location_parent = strcat(main_dir, '/sourcedata/raw/', session, '/eeg');
-rawdata_location_parent = strcat(main_dir, '/sourcedata/raw/', session, '/eeg'); % updated to worlk with checked data only
->>>>>>> addd27c45721363edf9cc73bb3155c5c8756c1fa
 rawdata_location_parent = char(rawdata_location_parent);
 
 % 2. Enter the path of the channel location file
@@ -126,10 +109,6 @@ rawdata_location_parent = char(rawdata_location_parent);
 channel_locations = loadbvef('/home/data/NDClab/tools/lab-devOps/scripts/MADE_pipeline_standard/eeg_preprocessing/chan_locs_files/electrode_locs_files/CACS-128-X7-FIXED-64only.bvef');
 
 % STIMULUS TRIGGERS
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> addd27c45721363edf9cc73bb3155c5c8756c1fa
 % practice congruent right: 1
 % practice congruent left: 2
 % practice incongruent right: 3
@@ -148,7 +127,6 @@ channel_locations = loadbvef('/home/data/NDClab/tools/lab-devOps/scripts/MADE_pi
 % error: 12
 % technically correct response, but not the first response made: 21
 % technically error response, but not the first response made: 22
-<<<<<<< HEAD
 
 % 4. Do your data need correction for anti-aliasing filter and/or task related time offset?
 adjust_time_offset = 1; % 0 = NO (no correction), 1 = YES (correct time offset)
@@ -158,34 +136,19 @@ stimulus_markers = {'S  1', 'S  2', 'S  3', 'S  4', 'S 41', 'S 42', 'S 43', ...
 response_markers = {}; % enter the response makers that need to be adjusted for time offset % same as line above !!!
 stim_offset_list = [10.76, 11.83]; % results of all conducted timings tests for sys1 & sys2
 stimulus_timeoffset = round(mean(stim_offset_list)); % stimulus related time offset (in milliseconds). 0 = No time offset
-=======
-% Marker - Target Dir + Congruency + Social/Nonsocial
-% S 41 - Right + Congruent + Nonsocial
-% S 42 - Left + Congruent + Nonsocial
-% S 43 - Right + Incongruent + Nonsocial
-% S 44 - Left + Incongruent + Nonsocial
-% S 51 - Right + Congruent + Social
-% S 52 - Left + Congruent + Social
-% S 53 - Right + Incongruent + Social
-% S 54 - Left + Incongruent + Social
-=======
->>>>>>> addd27c45721363edf9cc73bb3155c5c8756c1fa
 
 % 4. Do your data need correction for anti-aliasing filter and/or task related time offset?
 adjust_time_offset = 1; % 0 = NO (no correction), 1 = YES (correct time offset)
 
 stimulus_markers = {'S  1', 'S  2', 'S  3', 'S  4', 'S 41', 'S 42', 'S 43', ...
-<<<<<<< HEAD
     'S 44', 'S 51', 'S 52', 'S 53', 'S 54'};      % enter the stimulus markers that need to be adjusted for time offset
 response_markers = {};       % enter the response makers that need to be adjusted for time offset
 read_stim_marker = {'S255', 'S127'}; %markers to identify reading ranger portion of task
->>>>>>> 10431854dee3db21da87de7075425644a3f470bf
-=======
+
     'S 44', 'S 51', 'S 52', 'S 53', 'S 54'}; % enter the stimulus markers that need to be adjusted for time offset % fine only if we dont adjust for onset, not even used further in the code
 response_markers = {}; % enter the response makers that need to be adjusted for time offset % same as line above !!!
 stim_offset_list = [10.76, 11.83]; % results of all conducted timings tests for sys1 & sys2
 stimulus_timeoffset = round(mean(stim_offset_list)); % stimulus related time offset (in milliseconds). 0 = No time offset
->>>>>>> addd27c45721363edf9cc73bb3155c5c8756c1fa
 
 % 5. Do you want to down sample the data?
 down_sample = 1; % 0 = NO (no down sampling), 1 = YES (down sampling)
@@ -256,17 +219,8 @@ subjects_to_process = strcat("sub-", subjects_to_process);
 parfor file_locater_counter = 1:length(subjects_to_process) %1:4
         try
         subjStart = tic;
-<<<<<<< HEAD
-<<<<<<< HEAD
         %rawdata_location = fullfile(rawdata_location_parent, subjects_to_process(file_locater_counter));
         rawdata_location = fullfile(rawdata_location_parent, subjects_to_process(file_locater_counter));
-=======
-        rawdata_location = fullfile(rawdata_location_parent, subjects_to_process(file_locater_counter), session, 'eeg');
->>>>>>> 10431854dee3db21da87de7075425644a3f470bf
-=======
-        %rawdata_location = fullfile(rawdata_location_parent, subjects_to_process(file_locater_counter));
-        rawdata_location = fullfile(rawdata_location_parent, subjects_to_process(file_locater_counter));
->>>>>>> addd27c45721363edf9cc73bb3155c5c8756c1fa
         rawdata_location = char(rawdata_location);
         if ~isdir(rawdata_location)
             warning(['Cannot find ' char(subjects_to_process(file_locater_counter)) ' folder in ' rawdata_location_parent ', skipping.']);
@@ -285,17 +239,8 @@ parfor file_locater_counter = 1:length(subjects_to_process) %1:4
         end
 
         % Enter the path of the folder where you want to save the processed data
-<<<<<<< HEAD
-<<<<<<< HEAD
 	% output_location = fullfile('/home/data/NDClab/analyses/thrive-theta-ddm', 'derivatives', 'preprocessed', 'test', '4cpu', subjects_to_process(file_locater_counter), session, 'eeg' );
         output_location = fullfile(main_dir, 'derivatives', 'preprocessed', subjects_to_process(file_locater_counter), session, 'eeg' );
-=======
-        output_location = fullfile(main_dir, "derivatives", "preprocessed", subjects_to_process(file_locater_counter), session, 'eeg');
->>>>>>> 10431854dee3db21da87de7075425644a3f470bf
-=======
-	% output_location = fullfile('/home/data/NDClab/analyses/thrive-theta-ddm', 'derivatives', 'preprocessed', 'test', '4cpu', subjects_to_process(file_locater_counter), session, 'eeg' );
-        output_location = fullfile(main_dir, 'derivatives', 'preprocessed', subjects_to_process(file_locater_counter), session, 'eeg' );
->>>>>>> addd27c45721363edf9cc73bb3155c5c8756c1fa
         % update the output_location
         output_location = char(output_location);
 
@@ -427,36 +372,6 @@ parfor file_locater_counter = 1:length(subjects_to_process) %1:4
             flankerIdx = find(ismember({EEG.event.type}, allFlankerMarkers));
             if isempty(flankerIdx)
                 error('No flanker stimulus markers found');
-<<<<<<< HEAD
-            end
-            firstFlanker = EEG.event(flankerIdx(1)).latency;
-            lastFlanker = EEG.event(flankerIdx(end)).latency;
-            startSample = max(1, round(firstFlanker - 30*EEG.srate));
-            endSample = min(EEG.pnts, round(lastFlanker + 30*EEG.srate));
-            EEG = pop_select(EEG, 'point', [startSample endSample]);
-            EEG = eeg_checkset(EEG);
-
-            %% STEP 1b: Remove reading ranger and convert all type field markers to string (if not already)
-            
-            %Remove reading ranger data from EEG structure (only flanker is included in this preprocessing)
-            if ismember(EEG.event(2).type, read_stim_marker) %identify if participant begins with reading ranger
-                for i = 1:length(EEG.event)
-                    if ismember(EEG.event(i).type, stimulus_markers) %find first event of arrow alert
-                        first_event_latency = EEG.event(i).latency;
-                        start_time = max(1, round(first_event_latency - 30*EEG.srate)); %start time is 30s before the first flanker stim event (practice trial inclusive)
-                        EEG_start_time = start_time; %save the start time to use later to select ranges of interest for flanker
-                        break %break to stop it from running on events after the first flanker event
-                    end
-                end
-                EEG.data = EEG.data(:, EEG_start_time:end); %select from 30s before first flanker (EEG_start_time to end of trial for EEG.data)
-                EEG.pnts = size(EEG.data,2); %resizing EEG.pnts to be the pnts in the now updated EEG.data
-                EEG.xmin = (EEG_start_time - 1) / EEG.srate;
-                for i = 1:length(EEG.event)
-                    EEG.event(i).latency = EEG.event(i).latency - EEG_start_time + 1; %update the latency to the new size of EEG.data
-                end
-                EEG.event = EEG.event(arrayfun(@(x)x.latency >= 1, EEG.event)); %
-=======
->>>>>>> addd27c45721363edf9cc73bb3155c5c8756c1fa
             end
             firstFlanker = EEG.event(flankerIdx(1)).latency;
             lastFlanker = EEG.event(flankerIdx(end)).latency;
@@ -544,7 +459,6 @@ parfor file_locater_counter = 1:length(subjects_to_process) %1:4
                         end
                     end
                 end
-<<<<<<< HEAD
                 % adjust response time offset
                 if response_timeoffset~=0
                     for rto=1:length(EEG.event)
@@ -557,27 +471,6 @@ parfor file_locater_counter = 1:length(subjects_to_process) %1:4
                 end
             end 
 
-<<<<<<< HEAD
-            %% STEP 3: Adjust anti-aliasing and task related time offset
-            if adjust_time_offset==1
-            %    %%%%%% adjust anti-aliasing filter time offset
-            %    if filter_timeoffset~=0
-            %        for aafto=1:length(EEG.event)
-            %            EEG.event(aafto).latency=EEG.event(aafto).latency+(filter_timeoffset/1000)*EEG.srate;
-            %        end
-            %    end
-                % adjust stimulus time offset
-                if stimulus_timeoffset~=0
-                    for sto=1:length(EEG.event)
-                        for sm=1:length(stimulus_markers)
-                            if strcmp(EEG.event(sto).type, stimulus_markers{sm})
-                                EEG.event(sto).latency=EEG.event(sto).latency+(stimulus_timeoffset/1000)*EEG.srate;
-                            end
-                        end
-                    end
-                end
-=======
->>>>>>> addd27c45721363edf9cc73bb3155c5c8756c1fa
             %    % adjust response time offset
             %    if response_timeoffset~=0
             %        for rto=1:length(EEG.event)
@@ -588,16 +481,6 @@ parfor file_locater_counter = 1:length(subjects_to_process) %1:4
             %            end
             %        end
             %    end
-<<<<<<< HEAD
-=======
-            %% STEP 4: Down sample data
-            if down_sample==1
-                EEG = pop_resample( EEG, sampling_rate);
-                EEG = eeg_checkset( EEG );
->>>>>>> 10431854dee3db21da87de7075425644a3f470bf
-=======
->>>>>>> addd27c45721363edf9cc73bb3155c5c8756c1fa
-            end
 
             %% STEP 5: Delete outer layer of channels
             chans_labels=cell(1,EEG.nbchan);
