@@ -1,5 +1,5 @@
 % Define the MADE processing pipeline as a function
-function [] = MADE_pipeline_testing(dataset, subjects, session)
+function [] = MADE_pipeline(dataset, subjects, session)
 
 % dataset: str like 'thrive-dataset'
 % subjects: str like '3000001/3000002/3000003/3000004'
