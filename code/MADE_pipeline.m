@@ -99,8 +99,12 @@ addpath(genpath('/home/data/NDClab/tools/lab-devOps/scripts/MADE_pipeline_standa
 rmpath(['/home/data/NDClab/tools/lab-devOps/scripts/MADE_pipeline_standard/eeglab13_4_4b' filesep 'functions' filesep 'octavefunc' filesep 'signal'])
 
 % 1. Enter the path of the folder that has the raw data to be analyzed
+<<<<<<< HEAD
 %rawdata_location_parent = strcat(main_dir, '/sourcedata/raw/', session, '/eeg');
 rawdata_location_parent = strcat(main_dir, '/sourcedata/raw/', session, '/eeg'); % updated to worlk with checked data only
+=======
+rawdata_location_parent = strcat(main_dir, '/sourcedata/raw/', session, '/eeg'); %directory on the HPC
+>>>>>>> 10431854dee3db21da87de7075425644a3f470bf
 rawdata_location_parent = char(rawdata_location_parent);
 
 % 2. Enter the path of the channel location file
@@ -109,6 +113,7 @@ rawdata_location_parent = char(rawdata_location_parent);
 channel_locations = loadbvef('/home/data/NDClab/tools/lab-devOps/scripts/MADE_pipeline_standard/eeg_preprocessing/chan_locs_files/electrode_locs_files/CACS-128-X7-FIXED-64only.bvef');
 
 % STIMULUS TRIGGERS
+<<<<<<< HEAD
 % practice congruent right: 1
 % practice congruent left: 2
 % practice incongruent right: 3
@@ -136,9 +141,33 @@ stimulus_markers = {'S  1', 'S  2', 'S  3', 'S  4', 'S 41', 'S 42', 'S 43', ...
 response_markers = {}; % enter the response makers that need to be adjusted for time offset % same as line above !!!
 stim_offset_list = [10.76, 11.83]; % results of all conducted timings tests for sys1 & sys2
 stimulus_timeoffset = round(mean(stim_offset_list)); % stimulus related time offset (in milliseconds). 0 = No time offset
+=======
+% Marker - Target Dir + Congruency + Social/Nonsocial
+% S 41 - Right + Congruent + Nonsocial
+% S 42 - Left + Congruent + Nonsocial
+% S 43 - Right + Incongruent + Nonsocial
+% S 44 - Left + Incongruent + Nonsocial
+% S 51 - Right + Congruent + Social
+% S 52 - Left + Congruent + Social
+% S 53 - Right + Incongruent + Social
+% S 54 - Left + Incongruent + Social
+
+% 4. Do your data need correction for anti-aliasing filter and/or task related time offset?
+adjust_time_offset = 1; % 0 = NO (no correction), 1 = YES (correct time offset)
+% If your data need correction for time offset, initialize the offset time (in milliseconds)
+filter_timeoffset = 0;     % anti-aliasing time offset (in milliseconds). 0 = No time offset
+stimulus_timeoffset_list   = [10.76, 11.83]; % list of stimulus time offsets (in milliseconds) from different subjects to be averaged
+stimulus_timeoffset = round(mean(stimulus_timeoffset_list)); % stimulus related time offset (in milliseconds)
+response_timeoffset = 0; % response related time offset (in milliseconds). 0 = No time offset
+
+stimulus_markers = {'S  1', 'S  2', 'S  3', 'S  4', 'S 41', 'S 42', 'S 43', ...
+    'S 44', 'S 51', 'S 52', 'S 53', 'S 54'};      % enter the stimulus markers that need to be adjusted for time offset
+response_markers = {};       % enter the response makers that need to be adjusted for time offset
+read_stim_marker = {'S255', 'S127'}; %markers to identify reading ranger portion of task
+>>>>>>> 10431854dee3db21da87de7075425644a3f470bf
 
 % 5. Do you want to down sample the data?
-down_sample = 1; % 0 = NO (no down sampling), 1 = YES (down sampling)
+down_sample = 0; % 0 = NO (no down sampling), 1 = YES (down sampling)
 sampling_rate = 1000; % set sampling rate (in Hz), if you want to down sample
 
 % 6. Do you want to delete the outer layer of the channels? (Rationale has been described in MADE manuscript)
@@ -203,11 +232,15 @@ subjects_to_process = string(split(subjects, "/"));
 subjects_to_process = subjects_to_process(subjects_to_process~=""); %nvm not necessary
 subjects_to_process = strcat("sub-", subjects_to_process);
 %for file_locater_counter = 1:length(subjects_to_process) % This for loop lists the folders containing the main data files
-parfor file_locater_counter = 1:length(subjects_to_process) %1:4
+parfor file_locater_counter = 1:length(subjects_to_process)
         try
         subjStart = tic;
+<<<<<<< HEAD
         %rawdata_location = fullfile(rawdata_location_parent, subjects_to_process(file_locater_counter));
         rawdata_location = fullfile(rawdata_location_parent, subjects_to_process(file_locater_counter));
+=======
+        rawdata_location = fullfile(rawdata_location_parent, subjects_to_process(file_locater_counter), session, 'eeg');
+>>>>>>> 10431854dee3db21da87de7075425644a3f470bf
         rawdata_location = char(rawdata_location);
         if ~isdir(rawdata_location)
             warning(['Cannot find ' char(subjects_to_process(file_locater_counter)) ' folder in ' rawdata_location_parent ', skipping.']);
@@ -226,8 +259,12 @@ parfor file_locater_counter = 1:length(subjects_to_process) %1:4
         end
 
         % Enter the path of the folder where you want to save the processed data
+<<<<<<< HEAD
 	% output_location = fullfile('/home/data/NDClab/analyses/thrive-theta-ddm', 'derivatives', 'preprocessed', 'test', '4cpu', subjects_to_process(file_locater_counter), session, 'eeg' );
         output_location = fullfile(main_dir, 'derivatives', 'preprocessed', subjects_to_process(file_locater_counter), session, 'eeg' );
+=======
+        output_location = fullfile(main_dir, "derivatives", "preprocessed", subjects_to_process(file_locater_counter), session, 'eeg');
+>>>>>>> 10431854dee3db21da87de7075425644a3f470bf
         % update the output_location
         output_location = char(output_location);
 
@@ -367,16 +404,61 @@ parfor file_locater_counter = 1:length(subjects_to_process) %1:4
             EEG = pop_select(EEG, 'point', [startSample endSample]);
             EEG = eeg_checkset(EEG);
 
-            %% STEP 4: Change sampling rate
-            if down_sample==1
-                if floor(sampling_rate) > EEG.srate
-                    error ('Sampling rate cannot be higher than recorded sampling rate');
-                elseif floor(sampling_rate) ~= EEG.srate
-                    EEG = pop_resample( EEG, sampling_rate);
-                    EEG = eeg_checkset( EEG );
+            %% STEP 1b: Remove reading ranger and convert all type field markers to string (if not already)
+            
+            %Remove reading ranger data from EEG structure (only flanker is included in this preprocessing)
+            if ismember(EEG.event(2).type, read_stim_marker) %identify if participant begins with reading ranger
+                for i = 1:length(EEG.event)
+                    if ismember(EEG.event(i).type, stimulus_markers) %find first event of arrow alert
+                        first_event_latency = EEG.event(i).latency;
+                        start_time = max(1, round(first_event_latency - 30*EEG.srate)); %start time is 30s before the first flanker stim event (practice trial inclusive)
+                        EEG_start_time = start_time; %save the start time to use later to select ranges of interest for flanker
+                        break %break to stop it from running on events after the first flanker event
+                    end
+                end
+                EEG.data = EEG.data(:, EEG_start_time:end); %select from 30s before first flanker (EEG_start_time to end of trial for EEG.data)
+                EEG.pnts = size(EEG.data,2); %resizing EEG.pnts to be the pnts in the now updated EEG.data
+                EEG.xmin = (EEG_start_time - 1) / EEG.srate;
+                for i = 1:length(EEG.event)
+                    EEG.event(i).latency = EEG.event(i).latency - EEG_start_time + 1; %update the latency to the new size of EEG.data
+                end
+                EEG.event = EEG.event(arrayfun(@(x)x.latency >= 1, EEG.event)); %
+            end
+
+            if ismember(EEG.event(2).type, stimulus_markers) %identify if participant begins with arrow alert
+                for i = 1:length(EEG.event)
+                    if ismember(EEG.event(i+1).type, read_stim_marker)
+                        last_event_latency = EEG.event(i).latency;
+                        end_time = min(size(EEG.data,2), round(last_event_latency + 30*EEG.srate));
+                        EEG_end_time = end_time;
+                        break
+                    end
+                end
+                EEG.data = EEG.data(:, 1:EEG_end_time);
+                EEG.pnts = size(EEG.data,2);
+                EEG.xmin = 0;
+                EEG.event = EEG.event(arrayfun(@(x) x.latency <= EEG_end_time, EEG.event));
+            end
+                
+            EEG = eeg_checkset(EEG);
+
+
+            %update/refresh eeglab and plot
+            %eeglab redraw
+
+            %convert all type field markers to string (if not already)
+
+            %loop through all the type markes, if numeric, convert to string
+            % (Given that this script assumes that "type" field markers are strings, we need to
+            % convert all type field markers to string, in case they are not
+            % already)
+            for atm=1:length({EEG.event.type})
+                if isnumeric(EEG.event(atm).type)
+                    EEG.event(atm).type = num2str(EEG.event(atm).type);
                 end
             end
 
+            %% STEP 2: Import channel locations & modify GSR and sync channels
             %make a copy of GSR and sync channels, then delete from eeg structure
 
             gsrChan = EEG.data(64, :);
@@ -408,26 +490,42 @@ parfor file_locater_counter = 1:length(subjects_to_process) %1:4
             EEG = eeg_checkset( EEG );
             %[ALLEEG EEG CURRENTSET] = eeg_store(ALLEEG, EEG, CURRENTSET);
 
-            %update/refresh eeglab and plot
-            %eeglab redraw
-
             % Check whether the channel locations were properly imported. The EEG signals and channel numbers should be same.
             if size(EEG.data, 1) ~= length(EEG.chanlocs)
                 error('The size of the data does not match with channel numbers.');
             end
 
-            %% STEP 1b: convert all type field markers to string (if not already)
-
-            %loop through all the type markes, if numeric, convert to string
-            % (Given that this script assumes that "type" field markers are strings, we need to
-            % convert all type field markers to string, in case they are not
-            % already)
-            for atm=1:length({EEG.event.type})
-                if isnumeric(EEG.event(atm).type)
-                    EEG.event(atm).type = num2str(EEG.event(atm).type);
+            %% STEP 3: Adjust anti-aliasing and task related time offset
+            if adjust_time_offset==1
+                % adjust anti-aliasing filter time offset
+                if filter_timeoffset~=0
+                    for aafto=1:length(EEG.event)
+                        EEG.event(aafto).latency=EEG.event(aafto).latency+(filter_timeoffset/1000)*EEG.srate;
+                    end
                 end
-            end
+                % adjust stimulus time offset
+                if stimulus_timeoffset~=0
+                    for sto=1:length(EEG.event)
+                        for sm=1:length(stimulus_markers)
+                            if strcmp(EEG.event(sto).type, stimulus_markers{sm})
+                                EEG.event(sto).latency=EEG.event(sto).latency+(stimulus_timeoffset/1000)*EEG.srate;
+                            end
+                        end
+                    end
+                end
+                % adjust response time offset
+                if response_timeoffset~=0
+                    for rto=1:length(EEG.event)
+                        for rm=1:length(response_markers)
+                            if strcmp(EEG.event(rto).type, response_markers{rm})
+                                EEG.event(rto).latency=EEG.event(rto).latency-(response_timeoffset/1000)*EEG.srate;
+                            end
+                        end
+                    end
+                end
+            end 
 
+<<<<<<< HEAD
             %% STEP 3: Adjust anti-aliasing and task related time offset
             if adjust_time_offset==1
             %    %%%%%% adjust anti-aliasing filter time offset
@@ -456,6 +554,12 @@ parfor file_locater_counter = 1:length(subjects_to_process) %1:4
             %            end
             %        end
             %    end
+=======
+            %% STEP 4: Down sample data
+            if down_sample==1
+                EEG = pop_resample( EEG, sampling_rate);
+                EEG = eeg_checkset( EEG );
+>>>>>>> 10431854dee3db21da87de7075425644a3f470bf
             end
 
             %% STEP 5: Delete outer layer of channels
