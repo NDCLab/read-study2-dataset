@@ -3,13 +3,12 @@ import re
 import glob
 
 input_dataset_path = "/home/data/NDClab/datasets/read-study2-dataset/"
-data_path = "sourcedata/raw/"
-sub_path = "s1_r1/psychopy/"
+data_path = "sourcedata/raw/s1_r1/psychopy/"
 
 sub_folders = [i for i in os.listdir(input_dataset_path + data_path) if i.startswith("sub-")]
 subjects = sorted([re.findall(r'\d+', item)[0] for item in sub_folders])
 for sub in subjects:
-    subject_folder = (input_dataset_path + data_path + "sub-" + sub + os.sep + sub_path)
+    subject_folder = (input_dataset_path + data_path + "sub-" + sub + os.sep)
     num_files = len(os.listdir(subject_folder))
     if (num_files != 6):
         print("sub-{} has unresolved deviation in psychopy data ({} files), skipping ...".format(sub, num_files))
