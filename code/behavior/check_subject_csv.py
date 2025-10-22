@@ -3,7 +3,7 @@ import re
 import glob
 
 input_dataset_path = "/home/data/NDClab/datasets/read-study2-dataset/"
-data_path = "sourcedata/raw/s1_r1/"
+data_path = "sourcedata/raw/"
 sub_path = "s1_r1/psychopy/"
 
 sub_folders = [i for i in os.listdir(input_dataset_path + data_path) if i.startswith("sub-")]
