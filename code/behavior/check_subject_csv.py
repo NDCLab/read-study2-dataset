@@ -10,8 +10,8 @@ sub_folders = [i for i in os.listdir(input_dataset_path + data_path) if i.starts
 subjects = sorted([re.findall(r'\d+', item)[0] for item in sub_folders])
 for sub in subjects:
     if sub in skip_subjects:
-    print(f"sub-{sub} skipped (in skip list)")
-    continue
+        print(f"sub-{sub} skipped (in skip list)")
+        continue
     subject_folder = (input_dataset_path + data_path + "sub-" + sub + os.sep)
     num_files = len(os.listdir(subject_folder))
     if (num_files != 6):
