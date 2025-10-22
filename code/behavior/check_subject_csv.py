@@ -17,5 +17,5 @@ for sub in subjects:
         print("sub-{} checked".format(sub))    
         pattern_arrow = "{}sub-{}_arrow-alert-nf-v1-2_psychopy_s1_r1_e1.csv".format(subject_folder, sub)
         assert len(glob.glob(pattern_arrow)) != 0, f"sub-{sub} arrow-alert .csv has deviation in filename"
-        pattern_reading = "{}sub-{}_reading-ranger-v2-1_psychopy_s1_r1_e1.csv".format(subject_folder, sub)
+        pattern_reading = "{}sub-{}_reading-ranger-v2-*_psychopy_s1_r1_e1.csv".format(subject_folder, sub)
         assert len(glob.glob(pattern_reading)) != 0, f"sub-{sub} reading-ranger .csv has deviation in filename"
