@@ -4,7 +4,7 @@ import glob
 
 input_dataset_path = "/home/data/NDClab/datasets/read-study2-dataset/"
 data_path = "sourcedata/raw/s1_r1/psychopy/"
-skip_subjects = ["3300118"]
+skip_subjects = ["3300118", "3300138"] #subs with _1 after s1_r1_e1 in reading-ranger filenames
 
 sub_folders = [i for i in os.listdir(input_dataset_path + data_path) if i.startswith("sub-")]
 subjects = sorted([re.findall(r'\d+', item)[0] for item in sub_folders])
