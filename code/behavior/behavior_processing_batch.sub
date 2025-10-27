@@ -18,8 +18,7 @@ pwd; hostname; date
 echo "flurm cpus per task: $SLURM_CPUS_PER_TASK"
 
 source activate base
-conda activate /home/data/NDClab/analyses/read-study2-alpha/containers/READenvironment
-conda run -n READenvironment python -u behavior_analysis.py $"s1_r1"
+conda run -p /home/data/NDClab/analyses/read-study2-alpha/containers/READenvironment python -u behavior_analysis.py "s1_r1"
 
 errors=$(cat ${SLURM_JOB_NAME}-${SLURM_JOB_ID}.out | grep "Error")
 if [[ -z ${errors} ]]; then
