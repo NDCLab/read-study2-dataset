@@ -39,20 +39,19 @@ session = sys.argv[1]
 #session = "s1_r1"
 input_dataset_path = "/home/data/NDClab/datasets/read-study2-dataset/"
 output_dataset_path = "/home/data/NDClab/analyses/read-study2-alpha/"
-data_path = "sourcedata/raw/"
-sub_path = f"{session}/psychopy/"
+data_path = f"sourcedata/raw/s1_r1/psychopy/"
 output_path = f"derivatives/behavior/{session}/"
 
 date_time = datetime.datetime.now().strftime("%d_%m_%Y_%H_%M_%S")
 sys.stdout = open(f"{output_dataset_path}{output_path}{date_time}_log.txt","wt")
 
-n_blocks = 20
+n_blocks = 18
 n_trials = 40
 valid_rt_thresh = 0.150
 
 #sub_folders = [i for i in os.listdir(input_dataset_path + data_path) if i.startswith("sub-")]
-sub_folders = glob.glob(f"{input_dataset_path}/{data_path}/sub-*/{sub_path}/*")
-subjects = sorted(set([re.findall(r'\d+', item.split("/")[-4])[0] for item in sub_folders]))
+sub_folders = glob.glob(f"{input_dataset_path}/{data_path}/sub-*/*")
+subjects = sorted(set([re.findall(r'\d+', item.split("/")[-2])[0] for item in sub_folders]))
 print(subjects)
 processing_log = dict()
 summary_columns = [
@@ -75,9 +74,9 @@ for condition in [0, 1]:
 
 for sub in subjects:
     processing_log["sub"].append(sub)    
-    subject_folder = (input_dataset_path + data_path + "sub-" + sub + os.sep + sub_path)
+    subject_folder = (input_dataset_path + data_path + "sub-" + sub)
     num_files = len(os.listdir(subject_folder))
-    if ((num_files != 3) and (sub not in ["3000124", "3000008", "3000014"]) and session == "s1_r1") or (np.any(["deviation" in i for i in os.listdir(subject_folder)])):
+    if ((num_files != 6) and session == "s1_r1") or (np.any(["deviation" in i for i in os.listdir(subject_folder)])):
         processing_log["success"].append(0)
         print("sub-{} has a deviation in psychopy data ({} files), skipping ...".format(sub, num_files))
         [processing_log[i].append(np.nan) for i in list(processing_log.keys())[2:]]
@@ -89,12 +88,13 @@ for sub in subjects:
         print("Processing sub-{}...".format(sub))
         processing_log["success"].append(1)
         
-        pattern = f"{subject_folder}/sub-{sub}_arrow-alert-v1-*_psychopy_{session}_e1.csv"
+        pattern = f"{subject_folder}/sub-{sub}_arrow-alert-nf-v1-*_psychopy_{session}_e1.csv"
         filename = glob.glob(pattern)
         data = pd.read_csv(filename[0])
         start_index = data["task_blockText.started"].first_valid_index()
         data = data.iloc[start_index:, :].dropna(subset = "middleStim")
         data = data[data["conditionText"].isin(["Observed", "Alone"])].reset_index(drop=True)
+        print(data, "!!!!")
         assert (len(data) == n_blocks * n_trials), "Check your data length!"
         processing_log["n_trials"].append(len(data))
         
@@ -291,8 +291,12 @@ for sub in subjects:
 pd.DataFrame(processing_log).to_csv(f"{output_dataset_path}{output_path}summary_{date_time}.csv", index=False)
 
 list_of_ind_csv = []
+print(output_dataset_path, "!!!")
+print(output_path, "!!!")
+print(df, "!!!")
 for df in sorted([i for i in os.listdir(f"{output_dataset_path}{output_path}") if "sub-" in i]):
     list_of_ind_csv.append(pd.read_csv(f"{output_dataset_path}{output_path}{df}"))
+print(list_of_ind_csv, "!!!!!")
 full_df = pd.concat(list_of_ind_csv)
 # full_df = full_df[(full_df["pre_accuracy"] == 1) | (full_df["pre_accuracy"] == 0)]
 full_df.to_csv(f"{output_dataset_path}{output_path}full_df_{date_time}.csv", index = False)
