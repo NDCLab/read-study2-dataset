@@ -6,8 +6,9 @@
 #SBATCH --partition=default-alternate
 
 SINGULARITY_VERSION="3.8.2"
-HM_CONTAINER="/home/data/NDClab/tools/containers/hallMonitor2/hm2_0-5-2.sif"
+HM_CONTAINER="/home/data/NDClab/datasets/read-study2-dataset/data-monitoring/hm2_0-5-8.sif"
+#HM_CONTAINER="/home/data/NDClab/tools/containers/hallMonitor2/hm2_0-5-8.sif"
 DATASET="/home/data/NDClab/datasets/read-study2-dataset"
 
 module load "singularity-$SINGULARITY_VERSION"
-singularity run "$HM_CONTAINER" "$DATASET" --child-data --no-color --suppress-missing-pending-qa
+singularity run "$HM_CONTAINER" "$DATASET" --child-data --no-color --suppress-missing-pending-qa --verbose --legacy-exceptions
