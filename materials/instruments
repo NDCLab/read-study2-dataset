@@ -1,1 +1,16 @@
 
+# instruments
+
+## Project Goal
+A home for all surveys, questionnaires, and inventories used by the NDCLab specific to read-study2.
+
+
+## Background & Design
+Each instrument used by the lab exists in the repo as a folder, containing (as applicable):
+* the published instrument
+* a REDCap import .zip for the instrument
+* a PDF of the instrument exported from REDCap, showing survey title and header information
+* any translations completed by the NDCLab or borrowed from elsewhere
+* a data dictionary, with details of all items and scores produced
+* an accompanying readme file with additional details
+
